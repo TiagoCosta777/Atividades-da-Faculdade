@@ -97,25 +97,35 @@ GROUP BY SupplierID
 HAVING COUNT(DISTINCT ProductID) > 5
 ;
 
-
-
-
 --11. Consulta Complexa
 --Mostre o valor total vendido (UnitPrice * Quantity * (1 - Discount)) por cada pedido (OrderID) e exiba apenas os pedidos cujo valor total ultrapasse 10.000.
-
-
-
-
+SELECT OrderID,
+SUM(UnitPrice * Quantity * (1 - Discount)) AS VL_Total
+FROM [Order Details]
+GROUP BY OrderID
+HAVING SUM(UnitPrice * Quantity * (1 - Discount)) > 10000
+;
 
 --Parte 3: Subconsultas e Cláusulas Extras
 --12. DISTINCT
 --Liste todos os cargos (Title) únicos da tabela Employees.
+SELECT DISTINCT Title
+FROM Employees
+;
 
 --13. Subconsulta com IN
 --Liste o nome de todos os produtos (ProductName) que são fornecidos por fornecedores localizados na Alemanha.
+SELECT ProductName
+FROM Products
+WHERE SupplierID IN (SELECT SupplierID
+FROM Suppliers
+WHERE Country = 'Germany')
+;
 
 --14. Subconsulta com Agregação
 --Liste os pedidos (OrderID, OrderDate) cujo valor do frete (Freight) seja maior que a média de todos os fretes.
+
+
 
 --Parte 4: Manipulação de Dados
 

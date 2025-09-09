@@ -301,7 +301,7 @@ FOREIGN KEY (Id_Procedimento_Medico) REFERENCES Procedimento_Medico(Id_Procedime
 );
 GO
 
-
+--obs no modelo fisico tinha algumas fk que não existem 
 CREATE TABLE Detalhe_Internacao(
 Id_Detalhe_Internacao INT PRIMARY KEY IDENTITY(1,1),
 Id_Internacao INT NOT NULL,
