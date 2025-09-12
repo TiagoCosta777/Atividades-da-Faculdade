@@ -124,8 +124,15 @@ WHERE Country = 'Germany')
 
 --14. Subconsulta com Agregação
 --Liste os pedidos (OrderID, OrderDate) cujo valor do frete (Freight) seja maior que a média de todos os fretes.
-
-
+SELECT 
+OrderID, 
+OrderDate, 
+Freight
+FROM Orders
+WHERE Freight > (SELECT AVG(Freight) AS Media_freight
+FROM Orders
+)
+;
 
 --Parte 4: Manipulação de Dados
 
@@ -141,12 +148,29 @@ WHERE Country = 'Germany')
 --City = 'São Paulo'
 
 --Country = 'Brazil'
+INSERT INTO Customers(CustomerID, CompanyName, ContactName, City, Country)
+VALUES
+('TIAGO', 'Teck Solutions', 'Tiago Costa', 'São Paulo', 'Brazil')
+;
+GO
 
+SELECT*
+FROM Customers
+WHERE CustomerID = 'TIAGO'
+;
 --16. UPDATE
 --Atualize o ContactTitle do cliente TIAG0 para 'Data Analyst'.
+UPDATE Customers
+SET ContactTitle = 'Data Analyst'
+WHERE CustomerID = 'TIAGO'
+;
+
 
 --17. DELETE
 --Exclua o cliente TIAG0 da tabela Customers.
+DELETE FROM Customers
+WHERE CustomerID = 'TIAGO'
+;
 
 --Parte 5: Criação e Alteração de Estruturas
 
@@ -159,8 +183,29 @@ WHERE Country = 'Germany')
 
 --DataLog (DATE, default = GETDATE())
 
+CREATE TABLE LogsPedidos(
+LogID INT PRIMARY KEY IDENTITY(1,1),
+OrderID INT NOT NULL,
+DataLog DATE DEFAULT GETDATE()
+)
+;
+SELECT*
+FROM LogsPedidos
+;
+
+DROP TABLE LogsPedidos
+;
 --19. Constraints
 --Recrie a tabela LogsPedidos adicionando a constraint de foreign key ligando OrderID a Orders(OrderID).
-
+CREATE TABLE LogsPedidos(
+LogID INT PRIMARY KEY IDENTITY(1,1),
+OrderID INT NOT NULL,
+DataLog DATE DEFAULT GETDATE()
+FOREIGN KEY(OrderId) REFERENCES Orders(OrderId)
+)
+;
+GO
 --20. ALTER TABLE
 --Na tabela LogsPedidos, adicione uma coluna chamada Usuario (VARCHAR(50)). Em seguida, remova essa mesma coluna.
+ALTER TABLE LogsPedidos ADD Usuario VARCHAR(50);
+ALTER TABLE LogsPedidos DROP COLUMN Usuario;
