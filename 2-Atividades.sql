@@ -349,21 +349,89 @@ GO
 
 
 --39. Formato de Endereço: Crie uma consulta que exiba o endereço completo dos clientes da 'Germany' em uma única coluna, no formato: "Endereço: [Address], Cidade: [City], CEP: [PostalCode]".
-
+SELECT CONCAT('Endereço: ', Address, ' Cidade: ', City, ' Cep: ', PostalCode) AS ENDERECO
+FROM Customers
+WHERE Country = 'Germany'
+;
+GO
 
 --40. Relatório de Vendas Mensal: Agrupe as vendas por ano e mês, mostrando o valor total vendido. Ordene pelo ano e depois pelo mês.
+SELECT
+YEAR(O.OrderDate) AS ANO,
+MONTH(O.OrderDate) AS MES,
+SUM(OD.UnitPrice * OD.quantity) AS TOTAL_VEN
+FROM Orders O
+JOIN [Order Details] OD ON O.OrderID = OD.OrderID
+GROUP BY YEAR(O.OrderDate), MONTH(O.OrderDate)
+ORDER BY ANO, MES
+;
+GO
 
 --41. Produtos sem Venda: Liste todos os produtos que nunca foram vendidos.
+SELECT CONCAT( 'Codigo Produto: ', P.ProductID, ' Codigo Saida: ',
+O.OrderID) AS VENDAS_NULAS
+FROM Products P
+LEFT JOIN [Order Details] O ON P.ProductID = O.ProductID
+WHERE O.OrderID IS NULL
+;
+GO
 
 --42. Análise de Descontos: Calcule o valor total de desconto concedido por categoria de produto.
+SELECT C.CategoryName,
+SUM(OD.UnitPrice * OD.Quantity * OD.Discount) AS DESCONTO
+FROM [Order Details] OD
+JOIN Products P ON OD.ProductID = P.ProductID
+JOIN Categories C ON P.CategoryID = C.CategoryID 
+GROUP BY C.CategoryName
+;
+GO
 
 --43. Conversão para Moeda: Apresente o preço unitário de cada produto como uma string, formatada como 'R$ xx.xx'.
+SELECT
+ProductName,
+FORMAT(UnitPrice, 'C', 'pt-BR') AS PRECO
+FROM Products
+;
+GO
 
 --44. Clientes e Fornecedores na Mesma Cidade: Liste os nomes das empresas de clientes e fornecedores que estão localizados na mesma cidade.
-
+SELECT
+C.ContactName,
+C.City
+FROM Customers C
+WHERE C.City IN( SELECT S.City FROM Suppliers S
+);
+GO
 --45. Relatório de Frete: Para cada país de destino, calcule o custo médio do frete e o total de pedidos. Mostre apenas os países com mais de 10 pedidos.
+SELECT 
+ShipCountry,
+AVG(Freight) AS PRECO_MEDIO_FRETE,
+COUNT(OrderID) AS TOTAL
+FROM Orders 
+GROUP BY ShipCountry
+HAVING COUNT(OrderID) > 10
+ORDER BY PRECO_MEDIO_FRETE, TOTAL
+;
+GO
+
+
 
 --46. Funcionário do Mês: Identifique o funcionário que registrou o maior número de pedidos em julho de 1997.
+SELECT E.EmployeeID,
+E.FirstName,
+COUNT(O.EmployeeID) AS TOTAL,
+YEAR(OrderDate) AS ANO,
+MONTH(OrderDate) AS MES
+FROM Orders O
+JOIN Employees E ON O.EmployeeID = E.EmployeeID
+GROUP BY E.EmployeeID, E.FirstName
+HAVING YEAR(OrderDate) = 1997 AND MONTH(OrderDate) = 7
+ORDER BY TOTAL DESC
+;
+GO
+
+
+
 
 --47. Primeiro e Último Pedido: Para cada cliente, mostre a data do seu primeiro e do seu último pedido.
 
