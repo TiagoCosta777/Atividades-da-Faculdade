@@ -196,18 +196,179 @@ GO
 
 
 --23. Potenciação: Para cada item detalhado do pedido, calcule o preço unitário elevado à quantidade (este é um cálculo hipotético para praticar a função).
-
-
-
-
+SELECT 
+ProductName,
+POWER(CAST(UnitPrice AS FLOAT), UnitsInStock) AS POTENCIACAO
+FROM Products
+;
+GO
 
 --24. Raiz Quadrada: Exiba a raiz quadrada do ID dos primeiros 10 produtos.
-
+SELECT TOP(10)
+ProductID,
+SQRT(ProductID)
+FROM Products
+ORDER BY ProductID ASC
+;
+GO
 --25. Valor Máximo entre Colunas: Para cada produto, mostre o maior valor entre as unidades em estoque e as unidades em pedido.
+SELECT ProductID,
+GREATEST(UnitsInStock, UnitsOnOrder) AS MAIOR_VALOR
+FROM Products
+;
+GO
 
 --26. Conversão de Tipos: Some o ID do produto com o ID da sua categoria. Em seguida, tente concatenar o ID do produto com o seu nome sem fazer uma conversão explícita e observe o erro. Corrija a consulta para que funcione.
+SELECT 
+ProductID,
+CategoryID,
+ProductID+CategoryID AS SOMA_ID
+FROM Products
+;
+GO
 
 --27. Piso e Teto: Para os 10 produtos mais caros, mostre o preço unitário, seu valor "piso" (menor inteiro) e seu valor "teto" (maior inteiro).
+SELECT TOP(10)
+ProductID,
+UnitPrice,
+FLOOR(UnitPrice) AS VALOR_PISO,
+CEILING(UnitPrice) AS VALOR_TETO
+FROM Products
+ORDER BY UnitPrice DESC
+;
+GO
 
 --28. Sinal do Estoque: Use uma função para mostrar se o estoque de cada produto é positivo (1), zero (0) ou negativo (-1).
+SELECT ProductID,
+UnitsInStock,
+SIGN(UnitsInStock) AS Sinal_do_Estoque
+FROM Products
+;
+GO
 
+
+-- Parte 4: Operadores de Conjunto e Filtros Avançados
+
+
+--29. União de Cidades: Crie uma lista única de todas as cidades onde há clientes e onde há fornecedores.
+SELECT City
+FROM Customers
+UNION
+SELECT City
+FROM Suppliers
+;
+GO
+
+--30. União com Duplicatas: Faça o mesmo que no exercício anterior, mas agora inclua as cidades duplicadas.
+SELECT City
+FROM Customers
+UNION ALL
+SELECT City
+FROM Suppliers
+;
+GO
+
+--31. Interseção de Países: Liste todos os países que têm tanto clientes quanto fornecedores.
+SELECT Country
+FROM Customers
+INTERSECT
+SELECT Country
+FROM Suppliers
+;
+GO
+
+--32. Filtro com Lista: Selecione todos os produtos que pertencem às categorias 'Confections' ou 'Dairy Products'.
+SELECT 
+P.ProductID,
+P.ProductName 
+FROM Products P
+JOIN Categories C ON P.CategoryID = C.CategoryID
+WHERE C.CategoryName IN ('Confections', 'Dairy Products')
+;
+GO
+
+--33. Clientes sem Pedidos: Liste todos os clientes que nunca fizeram um pedido.
+SELECT 
+C.CustomerID,
+C.CompanyName
+FROM Customers C
+LEFT JOIN Orders O ON C.CustomerID = O.CustomerID
+WHERE O.OrderID IS NULL
+;
+GO
+
+--34. Intervalo de Preços: Encontre todos os produtos com preço unitário entre $20 e $50.
+SELECT 
+ProductID,
+ProductName,
+UnitPrice
+FROM Products
+WHERE UnitPrice BETWEEN 20 AND 50
+;
+GO
+
+--35. Intervalo de Datas: Liste todos os pedidos feitos no primeiro semestre de 1998.
+SELECT
+OrderID,
+OrderDate
+FROM Orders
+WHERE YEAR(OrderDate) = 1998
+AND MONTH(OrderDate) BETWEEN 1 AND 6
+;
+GO
+
+--36. Verificação de Nulos: Encontre todos os clientes cuja região não está preenchida.
+SELECT CustomerID,
+ContactName,
+Region
+FROM Customers
+WHERE Region IS NULL
+; 
+GO
+
+--37. Verificação de Não Nulos: Liste todos os funcionários que têm um supervisor.
+SELECT*
+FROM Employees
+WHERE ReportsTo IS NOT NULL
+;
+GO
+
+
+--38. Verificação de Existência: Selecione todos os fornecedores para os quais existe pelo menos um produto cadastrado.
+SELECT*
+FROM Suppliers S
+WHERE EXISTS (
+SELECT 1
+FROM Products P 
+ WHERE P.SupplierID = S.SupplierID)
+;
+GO
+
+
+-- Parte 5: Exercícios Mistos e Desafios
+
+
+--39. Formato de Endereço: Crie uma consulta que exiba o endereço completo dos clientes da 'Germany' em uma única coluna, no formato: "Endereço: [Address], Cidade: [City], CEP: [PostalCode]".
+
+
+--40. Relatório de Vendas Mensal: Agrupe as vendas por ano e mês, mostrando o valor total vendido. Ordene pelo ano e depois pelo mês.
+
+--41. Produtos sem Venda: Liste todos os produtos que nunca foram vendidos.
+
+--42. Análise de Descontos: Calcule o valor total de desconto concedido por categoria de produto.
+
+--43. Conversão para Moeda: Apresente o preço unitário de cada produto como uma string, formatada como 'R$ xx.xx'.
+
+--44. Clientes e Fornecedores na Mesma Cidade: Liste os nomes das empresas de clientes e fornecedores que estão localizados na mesma cidade.
+
+--45. Relatório de Frete: Para cada país de destino, calcule o custo médio do frete e o total de pedidos. Mostre apenas os países com mais de 10 pedidos.
+
+--46. Funcionário do Mês: Identifique o funcionário que registrou o maior número de pedidos em julho de 1997.
+
+--47. Primeiro e Último Pedido: Para cada cliente, mostre a data do seu primeiro e do seu último pedido.
+
+--48. Produtos com "Chocolate": Encontre todos os produtos que contenham a palavra "chocolate" em seu nome, independentemente de estar em maiúsculas ou minúsculas.
+
+--49. Diferença de Preço para a Média: Para cada produto, mostre seu nome, seu preço e uma coluna indicando a diferença entre o seu preço e o preço médio de todos os produtos.
+
+--50. Ranking de Vendas por Produto: Crie um ranking dos 10 produtos mais vendidos (em valor total). A consulta deve mostrar a posição no ranking, o nome do produto e o total vendido.
