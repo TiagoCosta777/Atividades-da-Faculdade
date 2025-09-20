@@ -417,26 +417,60 @@ GO
 
 
 --46. Funcionário do Mês: Identifique o funcionário que registrou o maior número de pedidos em julho de 1997.
-SELECT E.EmployeeID,
+SELECT  TOP (1)
+E.EmployeeID,
 E.FirstName,
-COUNT(O.EmployeeID) AS TOTAL,
-YEAR(OrderDate) AS ANO,
-MONTH(OrderDate) AS MES
+COUNT(O.EmployeeID) AS TOTAL
 FROM Orders O
 JOIN Employees E ON O.EmployeeID = E.EmployeeID
+WHERE YEAR(OrderDate) = 1997 AND MONTH(OrderDate) = 7
 GROUP BY E.EmployeeID, E.FirstName
-HAVING YEAR(OrderDate) = 1997 AND MONTH(OrderDate) = 7
 ORDER BY TOTAL DESC
 ;
 GO
 
 
-
-
 --47. Primeiro e Último Pedido: Para cada cliente, mostre a data do seu primeiro e do seu último pedido.
+SELECT 
+C.CustomerID,
+C.ContactName,
+MIN(O.OrderDate) AS PRIMEIRO_PEDIDO,
+MAX(O.OrderDate) AS ULTIMO_PEDIDO
+FROM Customers C
+JOIN Orders O ON C.CustomerID = O.CustomerID
+GROUP BY C.CustomerID, C.ContactName
+;
+GO
+
 
 --48. Produtos com "Chocolate": Encontre todos os produtos que contenham a palavra "chocolate" em seu nome, independentemente de estar em maiúsculas ou minúsculas.
+SELECT 
+ProductID,
+ProductName
+FROM Products
+WHERE LOWER(ProductName) LIKE '%chocolate%'
+;
+GO
+
 
 --49. Diferença de Preço para a Média: Para cada produto, mostre seu nome, seu preço e uma coluna indicando a diferença entre o seu preço e o preço médio de todos os produtos.
+SELECT 
+ProductName,
+UnitPrice,
+UnitPrice - (SELECT AVG(UnitPrice) FROM Products )AS DiferencaPrecoMedio
+FROM Products
+;
+GO
+
 
 --50. Ranking de Vendas por Produto: Crie um ranking dos 10 produtos mais vendidos (em valor total). A consulta deve mostrar a posição no ranking, o nome do produto e o total vendido.
+SELECT TOP (10)
+RANK() OVER(ORDER BY SUM(PR.UnitPrice*OD.Quantity) DESC) AS POSICAO,
+PR.ProductName, 
+SUM(PR.UnitPrice*OD.Quantity) AS TOTAL
+FROM Products PR
+JOIN [Order Details] OD ON PR.ProductID = OD.ProductID
+GROUP BY PR.ProductName
+ORDER BY TOTAL DESC
+;
+GO
