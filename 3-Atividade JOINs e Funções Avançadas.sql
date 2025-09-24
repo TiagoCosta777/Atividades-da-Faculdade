@@ -58,19 +58,56 @@ USE SQL_EX;
     GO
 
     --7. Valor Total em Estoque por Fornecedor: Calcule o valor total em estoque (UnitPrice * UnitsInStock) para os produtos de cada fornecedor. Mostre o nome do fornecedor e o valor total, mas apenas para fornecedores cujo valor total em estoque exceda $3.000.
-    SELECT*
-    FROM [Order Details]
-    JOIN Products
-
-
+  SELECT SU.CompanyName,
+  SUM(PR.UnitPrice * PR.UnitsInStock) AS VALOR_TOTAL
+  FROM Products PR
+  JOIN Suppliers SU ON PR.SupplierID = SU.SupplierID
+  GROUP BY SU.CompanyName
+  HAVING SUM(PR.UnitPrice * PR.UnitsInStock) > 3000
+  ;
+  GO
 
     --8. Fornecedores Sem Produtos: Identifique o nome das empresas fornecedoras que não possuem nenhum produto cadastrado.
+    SELECT
+    SU.SupplierID,
+    SU.ContactName,
+    PR.SupplierID
+    FROM Suppliers SU
+    LEFT JOIN Products PR ON SU.SupplierID = PR.SupplierID
+    WHERE PR.SupplierID IS NULL
+    GO
 
     --9. Relatório Detalhado de Pedido: Para o pedido 10251, mostre o nome do cliente, a data do pedido formatada como dd/MM/yyyy, o nome do produto, a quantidade e o preço unitário.
+    SELECT 
+  CS.ContactName,
+  FORMAT(OD.OrderDate, 'dd/MM/yyyy') AS DATA_PEDIDO,
+  PR.ProductName,
+  OT.Quantity,
+  OT.UnitPrice
+    FROM Customers CS
+    JOIN Orders OD ON CS.CustomerID = OD.CustomerID
+    JOIN [Order Details] OT ON OD.OrderID = OT.OrderID
+    JOIN Products PR ON OT.ProductID = PR.ProductID
+WHERE OD.OrderID = 10251
+;
+GO
 
     --10. Categorias e Contagem de Produtos: Liste o nome de todas as categorias e a quantidade de produtos em cada uma. Inclua categorias que não possuem nenhum produto.
+SELECT CA.CategoryName,
+COUNT(PR.ProductID) AS QUANTIDADE_PRODUTOS
+FROM Categories CA
+LEFT JOIN Products PR ON CA.CategoryID = PR.CategoryID
+GROUP BY CA.CategoryName
+GO
+
 
     --11. Pedidos de 'Michael Suyama': Mostre todos os OrderIDs e as datas dos pedidos registrados pelo funcionário 'Michael Suyama'.
+    SELECT OD.EmployeeID,
+    OD.OrderDate
+    FROM Employees EM
+    JOIN Orders OD ON EM.EmployeeID = OD.EmployeeID
+    WHERE  EM.FirstName = 'Michael' AND EM.LastName = 'Suyama'
+    ;
 
     --12. Combinação Cruzada: Gere uma lista com todas as combinações possíveis entre os nomes das categorias e os nomes das empresas transportadoras.
 
